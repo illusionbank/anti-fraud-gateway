@@ -1,0 +1,15 @@
+{
+  "$id": "https://illusionbank.io/payment.schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Payment",
+  "description": "Data of Payment",
+  "required": [
+    "value"
+  ],
+  "type": "object",
+  "properties": {
+    "value": {
+      "type": "double"
+    }
+  }
+}

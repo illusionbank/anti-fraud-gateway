@@ -1,0 +1,15 @@
+{
+  "$id": "https://illusionbank.io/transfer.schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Transfer",
+  "description": "Data of Transfer",
+  "required": [
+    "value"
+  ],
+  "type": "object",
+  "properties": {
+    "value": {
+      "type": "double"
+    }
+  }
+}

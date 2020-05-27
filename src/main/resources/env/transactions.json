@@ -1,0 +1,29 @@
+[
+  {
+    "name": "IBCTATRA",
+    "format": "FixedLength",
+    "host": "btc.mainframe.ws",
+    "port": 9009,
+    "migration":null
+  },
+
+  {
+    "name": "IBCHABAC",
+    "format": "SOAP",
+    "host": "btc.mainframe.ws",
+    "port": 9009,
+    "migration":null
+  },
+
+  {
+    "name": "IBCTATRA",
+    "format": "FixedLength",
+    "host": "btc.mainframe.ws",
+    "port": 9009,
+    "migration": {
+      "criteria": {"criteria":"", "values":["SP", "RJ", "AM"]},
+      "host": "localhost",
+      "port": 9009
+    }
+  }
+]
