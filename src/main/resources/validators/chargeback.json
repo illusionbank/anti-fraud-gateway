@@ -1,0 +1,15 @@
+{
+  "$id": "https://illusionbank.io/chargeback.schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Charge Back",
+  "description": "Data of Chargeback",
+  "required": [
+    "value"
+  ],
+  "type": "object",
+  "properties": {
+    "value": {
+      "type": "double"
+    }
+  }
+}
