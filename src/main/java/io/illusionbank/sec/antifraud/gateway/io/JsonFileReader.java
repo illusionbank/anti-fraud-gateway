@@ -45,7 +45,7 @@ public class JsonFileReader {
             .collect(Collectors.toList());
     }
 
-    public Future<Map<String, FileEntry>> loadAndGroupFiles(String directory) {
+    public Future<Map<String, FileEntry>> getFilesFromDirectory(String directory) {
         Promise promise = Promise.promise();
         vertx.fileSystem().readDir(directory, filesResult -> {
             if (filesResult.succeeded()) {

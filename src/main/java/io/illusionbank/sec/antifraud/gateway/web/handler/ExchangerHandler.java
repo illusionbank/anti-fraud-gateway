@@ -1,9 +1,6 @@
 package io.illusionbank.sec.antifraud.gateway.web.handler;
 
-import io.illusionbank.sec.antifraud.gateway.proxy.HttpProxy;
-import io.illusionbank.sec.antifraud.gateway.proxy.MainFrameProxy;
-import io.illusionbank.sec.antifraud.gateway.proxy.Proxy;
-import io.illusionbank.sec.antifraud.gateway.proxy.SoapProxy;
+import io.illusionbank.sec.antifraud.gateway.driver.Driver;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
@@ -16,9 +13,9 @@ public class ExchangerHandler implements Handler<RoutingContext> {
   @Override
   public void handle(RoutingContext context) {
     log.info("ExchangerHandler");
-    Proxy proxy = context.get(Proxy.class.getSimpleName());
-    Promise<JsonObject> response = proxy.call();
-    response.future().onComplete(handler->{
+    Driver driver = context.get(Driver.class.getSimpleName());
+    Promise<JsonObject> response = driver.call();
+    response.future().onComplete(handler-> {
       if(handler.succeeded()) {
         context.response().setStatusCode(200);
         context.response().end("aa");

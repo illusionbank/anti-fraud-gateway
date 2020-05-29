@@ -12,8 +12,6 @@ public class Transaction {
     private String format;
     private String host;
     private Integer port;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Migration migration;
 
     public boolean hasMigration() {

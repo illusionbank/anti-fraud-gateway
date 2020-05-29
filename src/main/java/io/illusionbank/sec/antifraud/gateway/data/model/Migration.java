@@ -10,8 +10,6 @@ public class Migration {
     private String name;
     private String host;
     private Integer port;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Criteria criteria;
 
     public boolean matchWithClientAndRequest(ClientInfo clientInfo, AnalyzeRequest request) {

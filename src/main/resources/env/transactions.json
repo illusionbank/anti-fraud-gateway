@@ -21,7 +21,7 @@
     "host": "btc.mainframe.ws",
     "port": 9009,
     "migration": {
-      "criteria": {"criteria":"", "values":["SP", "RJ", "AM"]},
+      "criteria": {"criteria":"client.agency.state", "values":["SP", "RJ", "AM"]},
       "host": "localhost",
       "port": 9009
     }

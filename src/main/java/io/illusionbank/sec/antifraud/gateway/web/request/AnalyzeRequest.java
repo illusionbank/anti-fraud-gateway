@@ -19,7 +19,8 @@ public class AnalyzeRequest {
     private List<AnalyzeAttribute> attributes;
 
     public Map<String, Object> attributesToMap() {
-        return attributes.parallelStream().collect(Collectors.toMap(AnalyzeAttribute::getKey, Function.identity()));
+        return attributes.parallelStream()
+                .collect(Collectors.toMap(AnalyzeAttribute::getKey, Function.identity()));
     }
 
 }

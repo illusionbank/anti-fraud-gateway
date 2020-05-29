@@ -2,10 +2,9 @@ package io.illusionbank.sec.antifraud.gateway.verticle;
 
 import io.illusionbank.sec.antifraud.gateway.data.model.Agency;
 import io.illusionbank.sec.antifraud.gateway.data.model.Transaction;
-import io.illusionbank.sec.antifraud.gateway.io.FileEntry;
-import io.illusionbank.sec.antifraud.gateway.web.handler.CoexistenceHandler;
+import io.illusionbank.sec.antifraud.gateway.web.handler.DefineTargetHandler;
 import io.illusionbank.sec.antifraud.gateway.web.handler.DefineClientInfoHandler;
-import io.illusionbank.sec.antifraud.gateway.web.handler.DefineTransactionHandler;
+import io.illusionbank.sec.antifraud.gateway.web.handler.DefineRequestHandler;
 import io.illusionbank.sec.antifraud.gateway.web.handler.ExchangerHandler;
 import io.illusionbank.sec.antifraud.gateway.web.validator.ChagerBackValidatorHandler;
 import io.illusionbank.sec.antifraud.gateway.web.validator.PaymentValidatorHandler;
@@ -31,14 +30,14 @@ public class WebServerVerticle extends AbstractVerticle {
   public void start(Promise<Void> startPromise) throws Exception {
     var router = Router.router(vertx);
 
-    router.route().handler(new DefineTransactionHandler());
+    router.route().handler(new DefineRequestHandler());
 
     router.route("/transfer").handler(new TransferValidatorHandler());
     router.route("/payment").handler(new PaymentValidatorHandler());
     router.route("/chargeback").handler(new ChagerBackValidatorHandler());
 
     router.route().handler(new DefineClientInfoHandler(agencies));
-    router.route().handler(new CoexistenceHandler(transactions));
+    router.route().handler(new DefineTargetHandler(transactions));
     router.route().handler(new ExchangerHandler());
 
     vertx.createHttpServer().requestHandler(router).listen(8888, httpServerResult -> {

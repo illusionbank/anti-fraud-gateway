@@ -1,5 +1,6 @@
-package io.illusionbank.sec.antifraud.gateway.verticle;
+package io.illusionbank.sec.antifraud.gateway;
 
+import io.illusionbank.sec.antifraud.gateway.verticle.MainVerticle;
 import io.vertx.core.Launcher;
 
 public class MainGateway {

@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,36 +26,47 @@ public class MainVerticle extends AbstractVerticle {
     AgencyRepository agencyRepository = new AgencyRepository(vertx);
     JsonFileReader jsonFileReader = new JsonFileReader(vertx);
 
-    CompositeFuture dependencies = CompositeFuture.all(
-      jsonFileReader.loadAndGroupFiles("env"),
-      agencyRepository.findAgencies()
+    CompositeFuture dependenciesFuture = CompositeFuture.all(
+      jsonFileReader.getFilesFromDirectory("env"),
+      agencyRepository.findAllAgencies()
     );
 
-    dependencies.onComplete(adependenciesResult->{
-      if(adependenciesResult.succeeded()) {
-        List list = adependenciesResult.result().list();
-        Optional<List<Agency>> agenciesOptional = list.parallelStream().filter(i->i instanceof List).findFirst();
-        Optional<Map<String, FileEntry>> filesOptional = list.parallelStream().filter(i->i instanceof Map).findFirst();
-
-        List<Agency> agencies = agenciesOptional.map(Function.identity()).orElseGet(()-> Collections.emptyList());
-        Map<String, FileEntry> files = filesOptional.map(Function.identity()).orElseGet(()-> Collections.emptyMap());
-
-        JsonArray transactionsJsonArray = files.get("transactions.json").getContent().toJsonArray();
-
-        List<Transaction> transactions = transactionsJsonArray.stream()
-                .map(a->(JsonObject)a)
-                .map(json->json.mapTo(Transaction.class))
-                .collect(Collectors.toList());
-
-        startHttpServerVerticleWithDependencies(startPromise, agencies, transactions);
+    dependenciesFuture.onComplete(adependenciesResult->{
+      if(adependenciesResult.failed()) {
+        log.error("Erro ao buscar dependencias(Agencias e Transações) para o verticle");
+        startPromise.fail(adependenciesResult.cause());
 
       } else {
-        startPromise.fail(adependenciesResult.cause());
+        completeWithDependencies(startPromise, adependenciesResult.result().list());
+
       }
+
     });
   }
 
-  private void startHttpServerVerticleWithDependencies(Promise<Void> startPromise, List<Agency> agencies, List<Transaction> transactions) {
+
+  private void completeWithDependencies(Promise<Void> startPromise, List filesAnAgenciesAsList) {
+    final Optional<List<Agency>> agenciesOptional = filesAnAgenciesAsList.parallelStream()
+            .filter(i->i instanceof List)
+            .findFirst();
+
+    final Optional<Map<String, FileEntry>> filesOptional = filesAnAgenciesAsList.parallelStream()
+            .filter(i->i instanceof Map)
+            .findFirst();
+
+    List<Agency> agencies = agenciesOptional.orElseGet(()-> Collections.emptyList());
+    Map<String, FileEntry> filesMap = filesOptional.orElseGet(()-> Collections.emptyMap());
+
+    JsonArray transactionsJsonArray = filesMap.get("transactions.json").getContent().toJsonArray();
+
+    List<Transaction> transactions = transactionsJsonArray.stream()
+            .map(json->((JsonObject)json).mapTo(Transaction.class))
+            .collect(Collectors.toList());
+
+    deployWebServerVerticleWithDependenciesAndCompletePromise(startPromise, agencies, transactions);
+  }
+
+  private void deployWebServerVerticleWithDependenciesAndCompletePromise(Promise<Void> startPromise, List<Agency> agencies, List<Transaction> transactions) {
     vertx.deployVerticle(new WebServerVerticle(agencies, transactions), handler-> {
       if(handler.succeeded()) {
         log.info("WebServerVerticle - Deploy finalizado");

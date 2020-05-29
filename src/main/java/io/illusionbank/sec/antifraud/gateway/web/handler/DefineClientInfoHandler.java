@@ -9,8 +9,9 @@ import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class DefineClientInfoHandler implements Handler<RoutingContext> {
@@ -24,25 +25,27 @@ public class DefineClientInfoHandler implements Handler<RoutingContext> {
     public void handle(RoutingContext context) {
         log.info("DefineClientInfoHandler");
         AnalyzeRequest request = context.get(AnalyzeRequest.class.getSimpleName());
-        loadClintInfo(request, handler-> {
-            if(handler.succeeded()) {
-                context.put(ClientInfo.class.getSimpleName(), handler.result());
+        loadClientInfoFromRequest(request, clientInfoResult-> {
+            if(clientInfoResult.succeeded()) {
+                context.put(ClientInfo.class.getSimpleName(), clientInfoResult.result());
                 context.next();
             } else {
                 context.response().setStatusCode(500);
-                context.response().setStatusMessage(handler.cause().getMessage());
+                context.response().setStatusMessage(clientInfoResult.cause().getMessage());
                 context.response().end();
             }
         });
     }
 
-    private void loadClintInfo(AnalyzeRequest request, Handler<AsyncResult<ClientInfo>> handler) {
+    private void loadClientInfoFromRequest(AnalyzeRequest request, Handler<AsyncResult<ClientInfo>> handler) {
         // TODO melhorar a busca
+
+
         Optional<Agency> agencyOptional = this.agencies.parallelStream()
                 .filter(agency->agency.getCode().equals(request.getAgency()))
                 .findFirst();
 
-        if(!agencyOptional.isPresent()) {
+        if(agencyOptional.isEmpty()) {
             handler.handle(Future.factory.failureFuture("Agência não encontrada no cache"));
 
         } else {
